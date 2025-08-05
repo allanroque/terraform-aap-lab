@@ -1,0 +1,15 @@
+---
+- name: Instalacao e configuracao do apache httpd
+  hosts: server01.aroque.com.br
+  become: yes
+  tasks:
+    
+    - name: instalacao do pacote apache httpd
+      ansible.builtin.package:
+        name: httpd
+        state: present
+
+    - name: start servico httpd
+      service:
+        name: httpd
+        state: started
