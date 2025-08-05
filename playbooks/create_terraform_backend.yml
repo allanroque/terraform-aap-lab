@@ -3,13 +3,18 @@
   hosts: localhost
   connection: local
   gather_facts: false
-
   vars:
     bucket_prefix: "aap-tf-bucket"
     aws_region: "us-east-1"
-    bucket_name: "{{ bucket_prefix }}-{{ lookup('community.general.uuid') | lower }}"
 
   tasks:
+    - name: Gerar UUID com comando uuidgen
+      ansible.builtin.command: uuidgen
+      register: uuid_output
+
+    - name: Definir nome final do bucket
+      set_fact:
+        bucket_name: "{{ bucket_prefix }}-{{ uuid_output.stdout | lower }}"
 
     - name: Criar bucket S3
       amazon.aws.s3_bucket:
