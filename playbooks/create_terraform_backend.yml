@@ -1,0 +1,34 @@
+---
+- name: Criar backend S3 para Terraform (sem locking)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    bucket_prefix: "aap-tf-bucket"
+    aws_region: "us-east-1"
+    bucket_name: "{{ bucket_prefix }}-{{ lookup('community.general.uuid') | lower }}"
+
+  tasks:
+
+    - name: Criar bucket S3
+      amazon.aws.s3_bucket:
+        name: "{{ bucket_name }}"
+        state: present
+        region: "{{ aws_region }}"
+        acl: private
+        force: false
+
+    - name: Bloquear acesso público ao bucket
+      amazon.aws.s3_bucket:
+        name: "{{ bucket_name }}"
+        region: "{{ aws_region }}"
+        public_access:
+          block_public_acls: true
+          block_public_policy: true
+          ignore_public_acls: true
+          restrict_public_buckets: true
+
+    - name: Exibir nome final do bucket criado
+      debug:
+        msg: "Bucket criado com sucesso: {{ bucket_name }}"
